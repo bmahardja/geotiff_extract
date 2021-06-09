@@ -91,11 +91,17 @@ HSI_annual_sum_data<- HSI_annual_sum_data %>% filter(month>6)
 HSI_annual_sum_data <- HSI_annual_sum_data %>% expand(action, month, year) %>% full_join(HSI_annual_sum_data) %>%
   filter(!(grepl('smscg', action)&year==1930)) #take out smscg scenario for dry year (1930)
 
-#Fill NA with no action month
-HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1930,c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1930&HSI_annual_sum_data$action=="no+action"&HSI_annual_sum_data$month==7,c("value")]
-HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1940,c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1940&HSI_annual_sum_data$action=="no+action"&HSI_annual_sum_data$month==7,c("value")]
-HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1979,c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1979&HSI_annual_sum_data$action=="no+action"&HSI_annual_sum_data$month==7,c("value")]
-HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1986,c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1986&HSI_annual_sum_data$action=="no+action"&HSI_annual_sum_data$month==7,c("value")]
+#Fill July NA with no action month for NDFA
+HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1930&HSI_annual_sum_data$action=="ndfa",c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1930&HSI_annual_sum_data$action=="no+action"&HSI_annual_sum_data$month==7,c("value")]
+HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1940&HSI_annual_sum_data$action=="ndfa",c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1940&HSI_annual_sum_data$action=="no+action"&HSI_annual_sum_data$month==7,c("value")]
+HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1979&HSI_annual_sum_data$action=="ndfa",c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1979&HSI_annual_sum_data$action=="no+action"&HSI_annual_sum_data$month==7,c("value")]
+HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1986&HSI_annual_sum_data$action=="ndfa",c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1986&HSI_annual_sum_data$action=="no+action"&HSI_annual_sum_data$month==7,c("value")]
+#Fill July NA with SMSCG month for NDFA+SMSCG
+
+HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1940&HSI_annual_sum_data$action=="ndfa+smscg",c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1940&HSI_annual_sum_data$action=="smscg"&HSI_annual_sum_data$month==7,c("value")]
+HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1979&HSI_annual_sum_data$action=="ndfa+smscg",c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1979&HSI_annual_sum_data$action=="smscg"&HSI_annual_sum_data$month==7,c("value")]
+HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1986&HSI_annual_sum_data$action=="ndfa+smscg",c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1986&HSI_annual_sum_data$action=="smscg"&HSI_annual_sum_data$month==7,c("value")]
+
 
 #Export filled out data frame out into a csv file
 write.csv(HSI_annual_sum_data,file = "HSI.results_all_data_filled.csv",row.names = F)
@@ -123,11 +129,16 @@ HSIT_annual_sum_data<- HSIT_annual_sum_data %>% filter(month>6)
 HSIT_annual_sum_data <- HSIT_annual_sum_data %>% expand(action, month, year) %>% full_join(HSIT_annual_sum_data) %>%
   filter(!(grepl('smscg', action)&year==1930)) #take out smscg scenario for dry year (1930)
 
-#Fill NA with no action month
-HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1930,c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1930&HSIT_annual_sum_data$action=="no+action"&HSIT_annual_sum_data$month==7,c("value")]
-HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1940,c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1940&HSIT_annual_sum_data$action=="no+action"&HSIT_annual_sum_data$month==7,c("value")]
-HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1979,c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1979&HSIT_annual_sum_data$action=="no+action"&HSIT_annual_sum_data$month==7,c("value")]
-HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1986,c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1986&HSIT_annual_sum_data$action=="no+action"&HSIT_annual_sum_data$month==7,c("value")]
+#Fill July NA with no action month for NDFA
+HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1930&HSIT_annual_sum_data$action=="ndfa",c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1930&HSIT_annual_sum_data$action=="no+action"&HSIT_annual_sum_data$month==7,c("value")]
+HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1940&HSIT_annual_sum_data$action=="ndfa",c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1940&HSIT_annual_sum_data$action=="no+action"&HSIT_annual_sum_data$month==7,c("value")]
+HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1979&HSIT_annual_sum_data$action=="ndfa",c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1979&HSIT_annual_sum_data$action=="no+action"&HSIT_annual_sum_data$month==7,c("value")]
+HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1986&HSIT_annual_sum_data$action=="ndfa",c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1986&HSIT_annual_sum_data$action=="no+action"&HSIT_annual_sum_data$month==7,c("value")]
+#Fill July NA with SMSCG month for NDFA+SMSCG
+
+HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1940&HSIT_annual_sum_data$action=="ndfa+smscg",c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1940&HSIT_annual_sum_data$action=="smscg"&HSIT_annual_sum_data$month==7,c("value")]
+HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1979&HSIT_annual_sum_data$action=="ndfa+smscg",c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1979&HSIT_annual_sum_data$action=="smscg"&HSIT_annual_sum_data$month==7,c("value")]
+HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1986&HSIT_annual_sum_data$action=="ndfa+smscg",c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1986&HSIT_annual_sum_data$action=="smscg"&HSIT_annual_sum_data$month==7,c("value")]
 
 #Export filled out data frame out into a csv file
 write.csv(HSIT_annual_sum_data,file = "HSIT.results_all_data_filled.csv",row.names = F)
