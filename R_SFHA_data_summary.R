@@ -4,7 +4,7 @@
 #==========================================================================#
 
 #Set workspace
-setwd("D:/Projects/Structured Decision Making/2021-05-14 - Example files from RMA models")
+setwd("D:/Projects/Structured Decision Making/2021-06-07 - RMA model HSI calculation")
 
 library(stringr)
 library(rgdal)
@@ -27,11 +27,17 @@ EDSM_polygon<-st_read(file.path("Shapefiles","EDSM_Subregions_053019.shp"))%>% s
 
 
 #####
+#Change workspace
+setwd("D:/Projects/Structured Decision Making/2021-06-07 - RMA model HSI calculation/RMA model results - HSI")
+
 # Create the list of all the tif files in the directory. Can change to "hsit-avgmon_rma"
-list_tif <- dir(pattern = "*.tif") 
+list_tif <- dir(pattern = "1979.+hsit-avgmon") 
+#For "&" ("and"), if you know the order, use regex like 20130801.+USD or .+20130801.+USD.+. 
+#The .+ matches any characters in-between (and possibly before/after)
 
 #Create dataframe repository for results
 df <- data.frame(nrow=1:length(list_tif), filename=NA, value=NA, action=NA, year=NA, month=NA)
+
 
 #Loop to read each file one by one and store them into the data frame
 for (k in 1:length(list_tif)){
@@ -56,6 +62,81 @@ for (k in 1:length(list_tif)){
   
 }
 
-#Export data frame out into a csv file
-write.csv(df,file = "HSI_results.csv",row.names = F)
+#Switch work directory again
+setwd("D:/Projects/Structured Decision Making/2021-06-07 - RMA model HSI calculation")
 
+#Export data frame out into a csv file
+write.csv(df,file = "HSIT_results_1979.csv",row.names = F)
+
+
+
+
+
+
+
+###############################################
+###############################################
+###############################################
+#For summarizing data by year
+
+setwd("D:/Projects/Structured Decision Making/2021-06-07 - RMA model HSI calculation")
+
+# Create the list of the relevant csv files in the directory. 
+list_csv <- dir(pattern = "HSI_.+.csv") 
+#HSI
+HSI_annual_sum_data<-do.call(rbind,lapply(list_csv,read.csv))
+#Remove June since we're concerned with July-Oct
+HSI_annual_sum_data<- HSI_annual_sum_data %>% filter(month>6)
+#Add July for ndfa and ndfa+smscg with no-action data
+HSI_annual_sum_data <- HSI_annual_sum_data %>% expand(action, month, year) %>% full_join(HSI_annual_sum_data) %>%
+  filter(!(grepl('smscg', action)&year==1930)) #take out smscg scenario for dry year (1930)
+
+#Fill NA with no action month
+HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1930,c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1930&HSI_annual_sum_data$action=="no+action"&HSI_annual_sum_data$month==7,c("value")]
+HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1940,c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1940&HSI_annual_sum_data$action=="no+action"&HSI_annual_sum_data$month==7,c("value")]
+HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1979,c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1979&HSI_annual_sum_data$action=="no+action"&HSI_annual_sum_data$month==7,c("value")]
+HSI_annual_sum_data[is.na(HSI_annual_sum_data$value)&HSI_annual_sum_data$year==1986,c("value")] <- HSI_annual_sum_data[HSI_annual_sum_data$year==1986&HSI_annual_sum_data$action=="no+action"&HSI_annual_sum_data$month==7,c("value")]
+
+#Export filled out data frame out into a csv file
+write.csv(HSI_annual_sum_data,file = "HSI.results_all_data_filled.csv",row.names = F)
+
+#Sum by year
+HSI_annual_sum_data<-HSI_annual_sum_data %>% group_by(action,year) %>% summarise(annual_mean_value=mean(value)) %>%
+  mutate(WaterYearType= case_when(year == 1930 ~ "Dry",
+                                  year == 1940 ~ "Above Normal",
+                                  year == 1979 ~ "Below Normal",
+                                  year == 1986 ~ "Wet"))
+#Export data frame out into a csv file
+write.csv(HSI_annual_sum_data,file = "HSI.results_mean_summary.csv",row.names = F)
+
+
+
+##################################
+#HSIT
+list_csv <- dir(pattern = "HSIT_.+.csv") 
+
+HSIT_annual_sum_data<-do.call(rbind,lapply(list_csv,read.csv))
+
+#Remove June since we're concerned with July-Oct
+HSIT_annual_sum_data<- HSIT_annual_sum_data %>% filter(month>6)
+#Add July for ndfa and ndfa+smscg with no-action data
+HSIT_annual_sum_data <- HSIT_annual_sum_data %>% expand(action, month, year) %>% full_join(HSIT_annual_sum_data) %>%
+  filter(!(grepl('smscg', action)&year==1930)) #take out smscg scenario for dry year (1930)
+
+#Fill NA with no action month
+HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1930,c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1930&HSIT_annual_sum_data$action=="no+action"&HSIT_annual_sum_data$month==7,c("value")]
+HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1940,c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1940&HSIT_annual_sum_data$action=="no+action"&HSIT_annual_sum_data$month==7,c("value")]
+HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1979,c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1979&HSIT_annual_sum_data$action=="no+action"&HSIT_annual_sum_data$month==7,c("value")]
+HSIT_annual_sum_data[is.na(HSIT_annual_sum_data$value)&HSIT_annual_sum_data$year==1986,c("value")] <- HSIT_annual_sum_data[HSIT_annual_sum_data$year==1986&HSIT_annual_sum_data$action=="no+action"&HSIT_annual_sum_data$month==7,c("value")]
+
+#Export filled out data frame out into a csv file
+write.csv(HSIT_annual_sum_data,file = "HSIT.results_all_data_filled.csv",row.names = F)
+
+#Sum by year
+HSIT_annual_sum_data<-HSIT_annual_sum_data %>% group_by(action,year) %>% summarise(annual_mean_value=mean(value)) %>%
+  mutate(WaterYearType= case_when(year == 1930 ~ "Dry",
+                                  year == 1940 ~ "Above Normal",
+                                  year == 1979 ~ "Below Normal",
+                                  year == 1986 ~ "Wet"))
+#Export data frame out into a csv file
+write.csv(HSIT_annual_sum_data,file = "HSIT.results_mean_summary.csv",row.names = F)
