@@ -37,7 +37,7 @@ edsm_map<-ggplot() + theme_bw()+
 edsm_map
 
 # Print map
-tiff(filename="Figure_EDSM_Map.png", 
+tiff(filename="Figure_EDSM_Map.tiff", 
      type="cairo",
      units="in", 
      width=12*1, 
